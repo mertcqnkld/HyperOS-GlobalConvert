@@ -1,0 +1,42 @@
+name: Patch APK Online (Cloud Runner)
+
+on:
+  workflow_dispatch:
+    inputs:
+      apk_url:
+        description: "Direct APK Download URL"
+        required: true
+        type: string
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Set up Java (JDK 17)
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Global APK Patcher
+      run: |
+        python main.py "${{ github.event.inputs.apk_url }}" -o output
+
+    - name: Upload Patched APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: patched-global-apk
+        path: output/*.apk
