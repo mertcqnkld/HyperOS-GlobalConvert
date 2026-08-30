@@ -1,6 +1,6 @@
-# 🚀 GlobalConvertApps - Automated APK International Patcher
+# 🚀 HyperOS-GlobalConvert - Automated APK International Patcher
 
-[![CI Test Suite](https://github.com/your-username/GlobalConvertApps/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/GlobalConvertApps/actions/workflows/ci.yml)
+[![CI Test Suite](https://github.com/mertcqnkld/HyperOS-GlobalConvert/actions/workflows/ci.yml/badge.svg)](https://github.com/mertcqnkld/HyperOS-GlobalConvert/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
@@ -77,8 +77,8 @@
 
 ```bash
 # Depoyu klonlayın
-git clone https://github.com/your-username/GlobalConvertApps.git
-cd GlobalConvertApps
+git clone https://github.com/mertcqnkld/HyperOS-GlobalConvert.git
+cd HyperOS-GlobalConvert
 
 # Bağımlılıkları yükleyin
 pip install -r requirements.txt
