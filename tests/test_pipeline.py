@@ -66,5 +66,23 @@ class TestDexExtractorAndRepackager(unittest.TestCase):
             self.assertEqual(zf.read("classes2.dex"), b"NEW_PATCHED_DEX_2")
             self.assertEqual(zf.read("AndroidManifest.xml"), b"<mock-binary-manifest>")
 
+    def test_magisk_module_generation(self):
+        from core.magisk_generator import MagiskModuleGenerator
+        fake_apk = os.path.join(self.temp_dir, "MiuiGallery_global_patched.apk")
+        with open(fake_apk, "wb") as f:
+            f.write(b"FAKE_APK_CONTENT")
+
+        out_zip = os.path.join(self.temp_dir, "MiuiGallery_Magisk.zip")
+        res_zip = MagiskModuleGenerator.create_module(fake_apk, out_zip)
+        self.assertTrue(os.path.exists(res_zip))
+
+        with zipfile.ZipFile(res_zip, "r") as zf:
+            namelist = zf.namelist()
+            self.assertIn("module.prop", namelist)
+            self.assertIn("customize.sh", namelist)
+            self.assertIn("MiuiGallery_global_patched.apk", namelist)
+            prop_content = zf.read("module.prop").decode("utf-8")
+            self.assertIn("id=hyperos_global_miuigallery", prop_content)
+
 if __name__ == "__main__":
     unittest.main()

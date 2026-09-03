@@ -154,9 +154,55 @@ def run_patch_pipeline(
         final_output_path = os.path.join(output_dir, final_apk_name)
 
         output_apk_path = sign_and_align_apk(patched_unsigned_apk, final_output_path, progress_callback=lambda msg: log(msg, stage="SIGN"))
-        output_file_size = os.path.getsize(output_apk_path)
+        log(f"Successfully generated patched APK: {final_apk_name} ({output_file_size / (1024 * 1024):.2f} MB)", stage="COMPLETE", pct=95)
 
-        log(f"Successfully generated patched APK: {final_apk_name} ({output_file_size / (1024 * 1024):.2f} MB)", stage="COMPLETE", pct=100)
+        # -------------------------------------------------------------
+        # STEP 10: Generate Magisk Module & Audit Report
+        # -------------------------------------------------------------
+        magisk_zip_path = None
+        try:
+            from .magisk_generator import MagiskModuleGenerator
+            magisk_filename = f"{base_name_no_ext}_Global_Magisk.zip"
+            magisk_out = os.path.join(output_dir, magisk_filename)
+            log("Generating flashable Magisk / KernelSU module...", stage="MAGISK", pct=96)
+            magisk_zip_path = MagiskModuleGenerator.create_module(output_apk_path, magisk_out)
+            log(f"Magisk module generated: {magisk_filename}", stage="MAGISK", pct=98)
+        except Exception as mex:
+            log(f"Magisk module generation skipped: {mex}", stage="MAGISK")
+
+        report_path = os.path.join(output_dir, f"{base_name_no_ext}_patch_report.json")
+        try:
+            import json
+            report_data = {
+                "source": apk_source,
+                "output_apk": final_apk_name,
+                "file_size_bytes": output_file_size,
+                "total_dex_count": total_dex_count,
+                "total_patches": total_patches,
+                "patches": [
+                    {
+                        "class": p.class_name,
+                        "method": p.method_name,
+                        "line": p.line_number,
+                        "opcode": p.opcode,
+                        "register": p.register,
+                        "original_line": p.original_line,
+                        "injected_line": p.injected_line
+                    }
+                    for p in all_patches
+                ],
+                "skipped_count": len(all_skipped),
+                "verification": {
+                    "is_valid": verification.is_valid if verification else False,
+                    "verified_patches": verification.total_patches_verified if verification else 0
+                }
+            }
+            with open(report_path, "w", encoding="utf-8") as rf:
+                json.dump(report_data, rf, indent=2, ensure_ascii=False)
+            log(f"Audit report saved: {os.path.basename(report_path)}", stage="COMPLETE", pct=100)
+        except Exception as rex:
+            report_path = None
+            log(f"Could not save report: {rex}", stage="WARNING")
 
         return PipelineResult(
             success=True,
@@ -164,6 +210,8 @@ def run_patch_pipeline(
             output_apk_path=output_apk_path,
             output_filename=final_apk_name,
             file_size_bytes=output_file_size,
+            magisk_zip_path=magisk_zip_path,
+            report_path=report_path,
             total_dex_count=total_dex_count,
             total_patches=total_patches,
             patches=all_patches,

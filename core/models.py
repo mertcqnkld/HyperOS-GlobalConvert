@@ -48,6 +48,8 @@ class PipelineResult:
     output_apk_path: Optional[str] = None
     output_filename: Optional[str] = None
     file_size_bytes: int = 0
+    magisk_zip_path: Optional[str] = None
+    report_path: Optional[str] = None
     total_dex_count: int = 0
     total_patches: int = 0
     patches: List[PatchItem] = field(default_factory=list)

@@ -88,15 +88,23 @@ pip install -r requirements.txt
 
 ### 2. Web Arayüzünü Başlatma (Önerilen)
 
+#### Windows'ta Tek Tıkla:
+Doğrudan `run.bat` dosyasına çift tıklayın. Tarayıcınız otomatik olarak `http://localhost:8080` adresinde açılacaktır.
+
+#### Terminalden:
 ```bash
 python app.py
 ```
+veya
+```bash
+python web/app.py
+```
 
-Tarayıcınızda [http://127.0.0.1:8000](http://127.0.0.1:8000) adresine gidin.
-1. APK URL'sini yapıştırın.
-2. **"Patch & Build Global APK"** butonuna tıklayın.
-3. Canlı logları ve diff inceleyicisini takip edin.
-4. Tamamlandığında **"Download APK"** butonuyla imzalı APK'nızı indirin.
+Tarayıcınızda [http://localhost:8080](http://localhost:8080) adresine gidin.
+1. APK URL'sini (veya yerel dosya yolunu) yapıştırın.
+2. **"Patch Uygula & Global APK Oluştur"** butonuna tıklayın.
+3. Canlı işlem konsolunu ve yama sonuçlarını takip edin.
+4. Tamamlandığında **İmzalı APK**, **Magisk Modülü (ZIP)** ve **Denetim Raporu**'nu tek tıkla indirin.
 
 ---
 
@@ -143,7 +151,7 @@ python -m unittest discover -s tests -v
 ## 📁 Proje Yapısı (Project Structure)
 
 ```
-GlobalConvertApps/
+HyperOS-GlobalConvert/
 ├── core/
 │   ├── downloader.py       # Akışlı APK indirme ve ZIP başlığı doğrulama
 │   ├── dex_extractor.py    # classes*.dex ayıklama ve kayıpsız zip paketleme
@@ -151,21 +159,30 @@ GlobalConvertApps/
 │   ├── patcher.py          # Katı Smali parser ve register enjeksiyon motoru
 │   ├── verifier.py         # Satır satır diff audit ve güvenlik kontrolcüsü
 │   ├── signer.py           # V1/V2 APK imzalama ve 4-byte zipalign
+│   ├── magisk_generator.py # Magisk/KernelSU flashlanabilir modül üreticisi
 │   ├── pipeline.py         # Uçtan uca otomasyon orkestratörü
 │   └── models.py           # Veri modelleri ve tip tanımları
 ├── web/
-│   └── static/
-│       └── index.html      # Modern koyu tema Web UI & SSE istemcisi
+│   ├── templates/
+│   │   └── index.html      # Modern koyu tema Web UI arayüzü
+│   ├── static/
+│   │   ├── style.css       # Glassmorphism ve animasyonlu tema
+│   │   └── app.js          # Canlı konsol ve yama işleyici
+│   └── app.py              # Sıfır bağımlılıklı gömülü web sunucusu (port 8080)
+├── scripts/
+│   └── github_push.py      # Otomatik GitHub push betiği
 ├── tests/
 │   ├── test_patcher.py     # Smali kuralları ve edge-case testleri
 │   ├── test_verifier.py    # Diff denetleyici hata yakalama testleri
-│   └── test_pipeline.py    # DEX ayıklama ve paketleme testleri
+│   └── test_pipeline.py    # DEX ayıklama, paketleme ve Magisk testleri
 ├── .github/workflows/
 │   ├── ci.yml              # Otomatik test iş akışı
 │   └── patch_apk.yml       # Cloud APK derleme iş akışı
-├── app.py                  # FastAPI Web sunucusu
-├── main.py                 # Rich destekli CLI arayüzü
-├── requirements.txt        # Python bağımlılıkları
+├── app.py                  # Web sunucu başlatıcısı
+├── main.py                 # CLI arayüzü
+├── run.bat                 # Windows çift tıkla başlatıcı menüsü
+├── run.sh                  # Linux / macOS başlatıcı scripti
+├── requirements.txt        # Opsiyonel bağımlılıklar
 ├── .gitignore
 ├── LICENSE                 # MIT Lisansı
 └── README.md

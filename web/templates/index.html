@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HyperOS-GlobalConvert - Sistem Uygulamaları APK Yamalayıcı</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-glow glow-1"></div>
+    <div class="background-glow glow-2"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-wrapper">
+                <div class="logo-icon">🌐</div>
+                <div class="logo-text">
+                    <h1>HyperOS<span>GlobalConvert</span></h1>
+                    <p class="subtitle">Xiaomi / HyperOS Sistem Uygulamaları Global ROM Dönüştürücü</p>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="badge badge-pulse">v1.0.0</span>
+                <a href="https://github.com/mertcqnkld/HyperOS-GlobalConvert" target="_blank" class="badge badge-link">
+                    <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+                    GitHub Repo
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Card -->
+        <main class="card main-card">
+            <div class="card-header">
+                <h2>Otomatik APK Yamalama</h2>
+                <p>Xiaomi/HyperOS sistem uygulaması APK URL'sini (veya yerel dosya yolunu) girin. Sistem tüm <code>classes*.dex</code> dosyalarını tarar ve yalnızca method gövdesi içindeki <code>IS_INTERNATIONAL_BUILD</code> komutlarını cerrahi olarak <code>0x1</code> (true) yapar.</p>
+            </div>
+
+            <!-- Form -->
+            <form id="patchForm" class="patch-form">
+                <div class="input-group">
+                    <label for="apkUrl">APK İndirme URL'si veya Dosya Yolu</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="apkUrl" name="apkUrl" placeholder="https://example.com/app.apk veya C:\path\to\app.apk" required autocomplete="off">
+                        <button type="button" id="btnSample" class="btn-secondary" title="Hızlı test için örnek APK URL'si yükle">
+                            Örnek URL
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="btnStart" class="btn-primary">
+                        <span class="btn-icon">⚡</span>
+                        <span class="btn-text">Patch Uygula & Global APK Oluştur</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Progress Section (Hidden initially) -->
+            <div id="progressSection" class="progress-section hidden">
+                <div class="progress-header">
+                    <div class="status-indicator">
+                        <span class="pulse-dot"></span>
+                        <span id="statusText">İşlem başlatılıyor...</span>
+                    </div>
+                    <span id="progressPercent" class="progress-percent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progressBar" class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+
+                <!-- Terminal Logs -->
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="terminal-title">Canlı İşlem Konsolu</span>
+                    </div>
+                    <pre id="terminalLogs" class="terminal-logs"></pre>
+                </div>
+            </div>
+
+            <!-- Result Section (Hidden initially) -->
+            <div id="resultSection" class="result-section hidden">
+                <div class="success-banner">
+                    <div class="success-icon">✓</div>
+                    <div class="success-text">
+                        <h3>APK Başarıyla Global'e Dönüştürüldü!</h3>
+                        <p id="summaryText">IS_INTERNATIONAL_BUILD kontrolleri cerrahi olarak 0x1 yapıldı. Kaynaklar ve manifest %100 korundu, APK zipalign edilip imzalandı.</p>
+                    </div>
+                </div>
+
+                <!-- Applied Patches List -->
+                <div class="patches-card">
+                    <h4>✨ Uygulanan Cerrahi Bytecode Yamaları</h4>
+                    <div id="patchesList" class="patches-grid"></div>
+                </div>
+
+                <!-- Download Cards -->
+                <div class="downloads-grid">
+                    <div class="download-card highlight">
+                        <div class="download-info">
+                            <div class="dl-icon">📦</div>
+                            <div>
+                                <h5>İmzalı Global APK</h5>
+                                <p>Cihaza doğrudan kurulabilir / değiştirilebilir</p>
+                            </div>
+                        </div>
+                        <a id="btnDownloadApk" href="#" class="btn-download primary" download>
+                            <span>İndir (APK)</span>
+                        </a>
+                    </div>
+
+                    <div class="download-card">
+                        <div class="download-info">
+                            <div class="dl-icon">⚡</div>
+                            <div>
+                                <h5>Magisk / KernelSU Modülü</h5>
+                                <p>Root ile systemless flashlanabilir ZIP</p>
+                            </div>
+                        </div>
+                        <a id="btnDownloadMagisk" href="#" class="btn-download" download>
+                            <span>İndir (ZIP)</span>
+                        </a>
+                    </div>
+
+                    <div class="download-card">
+                        <div class="download-info">
+                            <div class="dl-icon">📋</div>
+                            <div>
+                                <h5>Denetim & Diff Raporu</h5>
+                                <p>JSON Güvenlik & Bytecode Doğrulaması</p>
+                            </div>
+                        </div>
+                        <a id="btnDownloadReport" href="#" class="btn-download" download>
+                            <span>Rapor (JSON)</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Features Info -->
+        <section class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h4>Cerrahi Smali Ayrıştırma</h4>
+                <p>Yalnızca method gövdesi içindeki gerçek field okumaları tespit edilir; .field tanımlarına ve string sabitlerine asla dokunulmaz.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h4>Katı Diff Denetimi</h4>
+                <p>İşlem sonrası tüm sınıflar satır satır denetlenir. Beklenmeyen bir satır değişikliği veya silinmesi durumunda bozuk APK üretilmez.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <h4>Kayıpsız Paketleme</h4>
+                <p>Resources.arsc, AndroidManifest.xml, native kütüphaneler ve grafik varlıkları ayrıştırılmaz; orijinal zip konteyneri korunur.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">✍️</div>
+                <h4>Otomatik V1/V2 İmzalı</h4>
+                <p>Çıktı APK'sı 4-byte zipalign işleminden geçirilir ve v1/v2 imzası uygulanarak kuruluma hazır teslim edilir.</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>HyperOS-GlobalConvert &bull; Otomatik Android Sistem Uygulamaları Yamalama Motoru &bull; MIT Lisansı</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
