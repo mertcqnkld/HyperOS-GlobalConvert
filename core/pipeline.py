@@ -154,6 +154,7 @@ def run_patch_pipeline(
         final_output_path = os.path.join(output_dir, final_apk_name)
 
         output_apk_path = sign_and_align_apk(patched_unsigned_apk, final_output_path, progress_callback=lambda msg: log(msg, stage="SIGN"))
+        output_file_size = os.path.getsize(output_apk_path) if os.path.exists(output_apk_path) else 0
         log(f"Successfully generated patched APK: {final_apk_name} ({output_file_size / (1024 * 1024):.2f} MB)", stage="COMPLETE", pct=95)
 
         # -------------------------------------------------------------
